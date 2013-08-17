@@ -12,25 +12,22 @@ def psql_cmd(sql) =
   string.split(separator="\|", result)
 end
 
-def escape_chars(str) = 
+def escape_sql_chars(str) = 
   str = string.replace(pattern="\n", (fun (s) -> ""), str)
   str = string.replace(pattern="\"", (fun (s) -> ""), str)
-  string.replace(pattern="'", (fun (s) -> ""), str)
+  string.replace(pattern="'", (fun (s) -> "\'"), str)
 end
 
 def on_next(m) =
   sched_id = m["dps_sched_id"]
   audio_id = m["dps_audio_id"]
-  title = escape_chars(m["dps_title"])
-  artist = escape_chars(m["dps_artist"])
+  title = escape_sql_chars(m["dps_title"])
+  artist = escape_sql_chars(m["dps_artist"])
 
   log(label="playback", level=1, "Now playing: #{artist} - #{title}")
 
   log(label="log", level=3, "Logging #{audio_id}")
   ignore(psql_cmd("insert into log(location, userid, track_title, track_artist) values(0, 1, '#{title}', '#{artist}');"))
-
-  log(label="sust_pop", level=3, "Removing #{sched_id} from scheduler playlist")
-  ignore(psql_cmd("delete from sustschedule where id = #{sched_id};"))
 end
 
 def fetch_next() =
@@ -47,13 +44,16 @@ def fetch_next() =
 
   metadata = "dps_audio_id=#{audio_id},dps_sched_id=#{sched_id},dps_md5=\"#{md5}\",dps_title=\"#{title}\",dps_artist=\"#{artist}\""
   log(label="fetch_next", level=2, "Fetched next track: #{artist} - #{title}")
+ 
+  log(label="sust_pop", level=3, "Removing #{sched_id} from scheduler playlist")
+  ignore(psql_cmd("delete from sustschedule where id = #{sched_id};"))
 
 	request.create("annotate:#{metadata}:replay_gain:#{archive}/#{prefix}/#{md5}.flac")
 end
 
 log(label="status", level=1, "Marceline starting up")
 
-sustainer = mksafe(smart_crossfade(start_next=5., width=3., conservative=true, high=-10., medium=-20., request.dynamic(fetch_next)))
+sustainer = mksafe(smart_crossfade(start_next=5., width=3., high=-10., medium=-25., request.dynamic(fetch_next)))
 
 main = amplify(1., override="replay_gain", sustainer)
 main = on_metadata(on_next, main)
