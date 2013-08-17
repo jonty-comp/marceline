@@ -5,7 +5,11 @@
 set("log.level", log_level)
 set("log.stdout", true)
 
-db_params = "#{db_host} #{db_port} #{db_user} #{db_name}"
+def psql_cmd(sql) =
+  result = get_process_output("psql -h #{db_host} -p #{db_port} -U #{db_user} -d #{db_name} -qAt -c \"#{sql}\"")
+  result = string.replace(pattern="\n", (fun (s) -> ""), result)
+  string.split(separator="\|", result)
+end
 
 def on_next(m) =
   title = m["dps_title"]
@@ -14,8 +18,7 @@ def on_next(m) =
 end
 
 def fetch_next() =
-  result = get_process_output("./db_functions.sh next #{db_params}")
-	result = string.split(separator="\|", result)
+  result = psql_cmd("select sustschedule.id, v_audio.id, md5, title, artist, path from v_audio join sustschedule on v_audio.id = sustschedule.audioid order by sustschedule.id ASC LIMIT 1;")
 
   sched_id = list.nth(result,0)
   audio_id = list.nth(result,1)
