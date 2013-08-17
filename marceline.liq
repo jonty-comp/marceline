@@ -6,7 +6,8 @@ db_params = "#{db_host} #{db_port} #{db_user} #{db_name}"
 set("log.stdout", true)
 
 def fetch_next() =
-  result = list.hd(get_process_lines("./db_functions.sh next #{db_params}"))
+  result = get_process_output("./db_functions.sh next #{db_params}")
+  print(result)
 	result = string.split(separator="\|", result)
 
   #id = list.nth(result,0)
