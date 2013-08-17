@@ -10,3 +10,7 @@ stream_url = "http://github.com/jonty-comp/marceline"
 
 enable_mp3 = true
 enable_flac = true
+
+output_alsa = true
+output_jack = false
+output_pulseaudio = false
