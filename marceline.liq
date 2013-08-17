@@ -6,24 +6,31 @@ set("log.level", log_level)
 set("log.stdout", true)
 
 def psql_cmd(sql) =
+  log(label="sql", level=4, sql)
   result = get_process_output("psql -h #{db_host} -p #{db_port} -U #{db_user} -d #{db_name} -qAt -c \"#{sql}\"")
   result = string.replace(pattern="\n", (fun (s) -> ""), result)
   string.split(separator="\|", result)
 end
 
+def escape_chars(str) = 
+  str = string.replace(pattern="\n", (fun (s) -> ""), str)
+  str = string.replace(pattern="\"", (fun (s) -> ""), str)
+  string.replace(pattern="'", (fun (s) -> ""), str)
+end
+
 def on_next(m) =
   sched_id = m["dps_sched_id"]
   audio_id = m["dps_audio_id"]
-  title = m["dps_title"]
-  artist = m["dps_artist"]
+  title = escape_chars(m["dps_title"])
+  artist = escape_chars(m["dps_artist"])
 
   log(label="playback", level=1, "Now playing: #{artist} - #{title}")
 
   log(label="log", level=3, "Logging #{audio_id}")
-  psql_cmd("insert into log(location, userid, track_title, track_artist) values(0, 1, '#{title}', '#{artist}';")
+  ignore(psql_cmd("insert into log(location, userid, track_title, track_artist) values(0, 1, '#{title}', '#{artist}');"))
 
   log(label="sust_pop", level=3, "Removing #{sched_id} from scheduler playlist")
-  psql_cmd("delete from sustschedule where id = #{sched_id};")
+  ignore(psql_cmd("delete from sustschedule where id = #{sched_id};"))
 end
 
 def fetch_next() =
