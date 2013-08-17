@@ -5,7 +5,7 @@ log_level = 1
 # Digiplay database parameters
 
 db_host = "localhost"
-db_post = 5432
+db_port = 5432
 db_user = "digiplay_user"
 db_name = "digiplay"
 
