@@ -7,7 +7,6 @@ set("log.stdout", true)
 
 def fetch_next() =
   result = get_process_output("./db_functions.sh next #{db_params}")
-  print(result)
 	result = string.split(separator="\|", result)
 
   #id = list.nth(result,0)
