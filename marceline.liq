@@ -19,7 +19,6 @@ def escape_sql_chars(str) =
 end
 
 def on_next(m) =
-  sched_id = m["dps_sched_id"]
   audio_id = m["dps_audio_id"]
   title = escape_sql_chars(m["dps_title"])
   artist = escape_sql_chars(m["dps_artist"])
@@ -44,7 +43,7 @@ def fetch_next() =
 
   metadata = "dps_audio_id=#{audio_id},dps_sched_id=#{sched_id},dps_md5=\"#{md5}\",dps_title=\"#{title}\",dps_artist=\"#{artist}\""
   log(label="fetch_next", level=2, "Fetched next track: #{artist} - #{title}")
- 
+
   log(label="sust_pop", level=3, "Removing #{sched_id} from scheduler playlist")
   ignore(psql_cmd("delete from sustschedule where id = #{sched_id};"))
 
