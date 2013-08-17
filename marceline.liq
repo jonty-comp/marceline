@@ -1,12 +1,23 @@
 #!/usr/bin/liquidsoap
 
 %include "config.liq"
+db_params = "#{db_host} #{db_port} #{db_user} #{db_name}"
 
 set("log.stdout", true)
 
 def fetch_next() =
-	result = list.hd(get_process_lines("./db_functions.sh next"))
-	request.create("replay_gain:"^result)
+  result = list.hd(get_process_lines("./db_functions.sh next #{db_params}"))
+	result = string.split(separator="\|", result)
+
+  #id = list.nth(result,0)
+  md5 = list.nth(result,1)
+  #title = list.nth(result,2)
+  #artist = list.nth(result,3)
+  archive = list.nth(result,4)
+
+  prefix = list.hd(string.split(separator="", md5))
+
+	request.create("replay_gain:#{archive}/#{prefix}/#{md5}.flac")
 end
 
 sustainer = mksafe(smart_crossfade(start_next=5., width=3., conservative=true, high=-10., medium=-20., request.dynamic(fetch_next)))

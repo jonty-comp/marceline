@@ -1,3 +1,10 @@
+# Digiplay database parameters
+
+db_host = "localhost"
+db_post = 5432
+db_user = "digiplay_user"
+db_name = "digiplay"
+
 # Icecast stream parameters
 
 stream_host = "icecast.server.com"
@@ -10,6 +17,8 @@ stream_url = "http://github.com/jonty-comp/marceline"
 
 enable_mp3 = true
 enable_flac = true
+
+# Physical output parameters
 
 output_alsa = true
 output_jack = false
