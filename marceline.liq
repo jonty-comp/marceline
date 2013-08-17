@@ -1,9 +1,10 @@
 #!/usr/bin/liquidsoap
 
-set("log.level", 1)
+%include "config.liq"
+
+set("log.level", log_level)
 set("log.stdout", true)
 
-%include "config.liq"
 db_params = "#{db_host} #{db_port} #{db_user} #{db_name}"
 
 def on_next(m) =
@@ -26,9 +27,12 @@ def fetch_next() =
   prefix = list.hd(string.split(separator="", md5))
 
   metadata = "dps_audio_id=#{audio_id},dps_sched_id=#{sched_id},dps_md5=\"#{md5}\",dps_title=\"#{title}\",dps_artist=\"#{artist}\""
+  log(label="fetch_next", level=2, "Fetched next track: #{artist} - #{title}")
 
 	request.create("annotate:#{metadata}:replay_gain:#{archive}/#{prefix}/#{md5}.flac")
 end
+
+log(label="status", level=1, "Marceline starting up")
 
 sustainer = mksafe(smart_crossfade(start_next=5., width=3., conservative=true, high=-10., medium=-20., request.dynamic(fetch_next)))
 
@@ -42,6 +46,7 @@ if enable_mp3 == true then
   		host = stream_host, port = stream_port, password = stream_password,
   		url = stream_url, name = stream_name, description = stream_description,
   		main))
+  log(label="icecast", level=1, "MP3 streaming started: http://#{stream_host}:#{stream_port}/#{stream_mount}.mp3")
 end
 
 if enable_flac == true then
@@ -51,16 +56,20 @@ if enable_flac == true then
   		host = stream_host, port = stream_port, password = stream_password,
   		url = stream_url, name = stream_name, description = stream_description,
   		main))
+  log(label="icecast", level=1, "FLAC streaming started: http://#{stream_host}:#{stream_port}/#{stream_mount}.flac")
 end
 
 if output_alsa == true then
   ignore(output.alsa(main))
+  log(label="alsa", level=1, "ALSA output started")
 end
 
 if output_jack == true then
   ignore(output.jack(main))
+  log(label="jack", level=1, "JACK output started")
 end
 
 if output_pulseaudio == true then
   ignore(output.pulseaudio(client="Marceline", main))
+  log(label="pulseaudio", level=1, "PulseAudio output started")
 end
