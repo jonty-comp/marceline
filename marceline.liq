@@ -15,7 +15,7 @@ end
 def escape_sql_chars(str) = 
   str = string.replace(pattern="\n", (fun (s) -> ""), str)
   str = string.replace(pattern="\"", (fun (s) -> ""), str)
-  string.replace(pattern="'", (fun (s) -> "\'"), str)
+  string.replace(pattern="'", (fun (s) -> "''"), str)
 end
 
 def on_next(m) =
