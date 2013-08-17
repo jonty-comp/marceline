@@ -18,7 +18,7 @@ if enable_mp3 == true then
   		%mp3(bitrate = 256), 
   		mount = "#{stream_mount}.mp3",
   		host = stream_host, port = stream_port, password = stream_password,
-  		public = stream_public, url = stream_url, name = stream_name,
+  		url = stream_url, name = stream_name, description = stream_description,
   		main))
 end
 
@@ -27,6 +27,6 @@ if enable_flac == true then
   		%ogg(%flac(compression = 7)), 
   		mount = "#{stream_mount}.flac",
   		host = stream_host, port = stream_port, password = stream_password,
-  		public = stream_public, url = stream_url, name = stream_name,
+  		url = stream_url, name = stream_name, description = stream_description,
   		main))
 end

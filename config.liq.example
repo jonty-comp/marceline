@@ -5,8 +5,8 @@ stream_port = 80
 stream_password = "hackme"
 stream_mount = "marceline"
 stream_name = "Marceline Jukebox Stream"
+stream_description = "24/7 Jukebox"
 stream_url = "http://github.com/jonty-comp/marceline"
-stream_public = false
 
 enable_mp3 = true
 enable_flac = true
