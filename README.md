@@ -14,7 +14,7 @@ Note that you will need to allow passwordless login to the database on whichever
 Roadmap
 -------
 
-- Replicate functionality of original sueplay (playing from DB playlist, crossfading, logging)
+- ~~Replicate functionality of original sueplay (playing from DB playlist, crossfading, logging)~~ *currently in extended testing*
 - Implement fallback solution (static emergency playlist)
 - Add automatic takeover when suitable external stream detected
 - Migrate to planned REST API instead of direct database access
