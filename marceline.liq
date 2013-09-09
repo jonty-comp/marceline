@@ -30,7 +30,7 @@ def on_next(m) =
 end
 
 def fetch_next() =
-  result = psql_cmd("select sustschedule.id, v_audio.id, md5, title, artist, path from v_audio join sustschedule on v_audio.id = sustschedule.audioid order by sustschedule.id ASC LIMIT 1;")
+  result = psql_cmd("select sustschedule.id, v_audio.id, md5, title, artist, path, start_smpl, end_smpl from v_audio join sustschedule on v_audio.id = sustschedule.audioid order by sustschedule.id ASC LIMIT 1;")
 
   sched_id = list.nth(result,0)
   audio_id = list.nth(result,1)
@@ -38,10 +38,13 @@ def fetch_next() =
   title = list.nth(result,3)
   artist = list.nth(result,4)
   archive = list.nth(result,5)
+  start = float_of_int(int_of_string(list.nth(result,6))) / 44100.0
+  finish = float_of_int(int_of_string(list.nth(result,7))) / 44100.0
+  log(label="cue_points", level=3, "Cue in: #{start} / cue out: #{finish}")
 
   prefix = list.hd(string.split(separator="", md5))
 
-  metadata = "dps_audio_id=#{audio_id},dps_sched_id=#{sched_id},dps_md5=\"#{md5}\",dps_title=\"#{title}\",dps_artist=\"#{artist}\""
+  metadata = "dps_audio_id=#{audio_id},dps_sched_id=#{sched_id},dps_md5=\"#{md5}\",dps_title=\"#{title}\",dps_artist=\"#{artist}\",liq_cue_in=#{start},liq_cue_out=#{finish}"
   log(label="fetch_next", level=2, "Fetched next track: #{artist} - #{title}")
 
   log(label="sust_pop", level=3, "Removing #{sched_id} from scheduler playlist")
@@ -52,7 +55,7 @@ end
 
 log(label="status", level=1, "Marceline starting up")
 
-sustainer = mksafe(smart_crossfade(start_next=5., width=3., high=-10., medium=-25., request.dynamic(fetch_next)))
+sustainer = mksafe(smart_crossfade(start_next=5., width=3., high=-5., medium=-20., cue_cut(request.dynamic(fetch_next))))
 
 main = amplify(1., override="replay_gain", sustainer)
 main = on_metadata(on_next, main)
