@@ -26,7 +26,7 @@ def on_next(m) =
   log(label="playback", level=1, "Now playing: #{artist} - #{title}")
 
   log(label="log", level=3, "Logging #{audio_id}")
-  ignore(psql_cmd("insert into log(location, userid, track_title, track_artist) values(0, 1, '#{title}', '#{artist}');"))
+  ignore(psql_cmd("insert into log(location, userid, track_title, track_artist, audioid) values(0, 1, '#{title}', '#{artist}', #{audio_id});"))
 end
 
 def fetch_next() =
