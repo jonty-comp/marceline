@@ -4,6 +4,7 @@
 
 set("log.level", log_level)
 set("log.stdout", true)
+set("request.metadata_decoders.duration",true)
 
 def psql_cmd(sql) =
   log(label="sql", level=4, sql)
@@ -26,7 +27,7 @@ def on_next(m) =
   log(label="playback", level=1, "Now playing: #{artist} - #{title}")
 
   log(label="log", level=3, "Logging #{audio_id}")
-  ignore(psql_cmd("insert into log(location, userid, track_title, track_artist, audioid) values(0, 1, '#{title}', '#{artist}', #{audio_id});"))
+  ignore(psql_cmd("insert into log(location, userid, track_title, track_artist, audioid) select 0, 1, v_audio_music.title, v_audio_music.artist, v_audio_music.id from v_audio_music where id = #{audio_id};"))
 end
 
 def fetch_next() =
@@ -55,9 +56,9 @@ end
 
 log(label="status", level=1, "Marceline starting up")
 
-sustainer = mksafe(smart_crossfade(start_next=5., width=3., high=-5., medium=-20., cue_cut(request.dynamic(fetch_next))))
+sustainer = amplify(1., override="replay_gain", cue_cut(request.dynamic(fetch_next)))
 
-main = amplify(1., override="replay_gain", sustainer)
+main = mksafe(smart_crossfade(start_next=5., width=3., high=-5., medium=-20., sustainer))
 main = on_metadata(on_next, main)
 
 if enable_mp3 == true then
