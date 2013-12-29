@@ -51,7 +51,7 @@ def fetch_next() =
   request.create("annotate:#{metadata}:replay_gain:#{path}/#{prefix}/#{md5}.flac")
 end
 
-sustainer = amplify(1., override="replay_gain", eat_blank(length=0.05,request.dynamic(length=next_prebuffer.,fetch_next)))
+sustainer = amplify(1., override="replay_gain", eat_blank(length=0.05,cue_cut(request.dynamic(length=next_prebuffer.,fetch_next))))
 
 main = mksafe(dps_crossfade(start_next=5., width=3., high=-5., medium=-20., sustainer))
 main = on_metadata(on_next, main)
