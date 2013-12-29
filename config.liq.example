@@ -4,8 +4,9 @@ log_level = 1
 
 # Seconds before end of track to start prebuffering the next one
 # (In case of super-slow network or high traffic)
+# Note . to signify floating-point number
 
-next_prebuffer = 15
+next_prebuffer = 15.
 
 # Digiplay database parameters
 
