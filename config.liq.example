@@ -2,6 +2,11 @@
 
 log_level = 1
 
+# Seconds before end of track to start prebuffering the next one
+# (In case of super-slow network or high traffic)
+
+next_prebuffer = 15
+
 # Digiplay database parameters
 
 db_host = "localhost"
